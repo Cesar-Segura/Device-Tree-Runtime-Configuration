@@ -9,7 +9,7 @@
 
 struct fdt_memory_reserve_entry *fdt_get_mem_resv_block(const void *fdt_blob)
 {
-    uint32_t address, size, curr_offset; 
+    uint32_t *address, *size, curr_offset; 
     struct fdt_memory_reserve_entry *entry_head, *curr_entry; 
 
     curr_offset = fdt_get_off_mem_rsvmap(fdt_blob);
@@ -17,20 +17,20 @@ struct fdt_memory_reserve_entry *fdt_get_mem_resv_block(const void *fdt_blob)
     curr_entry = NULL; 
 
     do {
-        address = fdt_get_offset_in_blob(fdt_blob, curr_offset); 
+        address = (uint32_t *) fdt_get_offset_in_blob(fdt_blob, curr_offset); 
         curr_offset += sizeof(uint64_t);
-        size = fdt_get_offset_in_blob(fdt_blob, curr_offset); 
+        size = (uint32_t *) fdt_get_offset_in_blob(fdt_blob, curr_offset); 
         curr_offset += sizeof(uint64_t); 
 
         if (curr_entry == NULL) {
-            entry_head->address = address;
-            entry_head->size = size; 
+            entry_head->address = *address;
+            entry_head->size = *size; 
             curr_entry = entry_head; 
         } else {
             curr_entry->next_entry = (struct fdt_memory_reserve_entry *) malloc(sizeof(struct fdt_memory_reserve_entry));
             curr_entry = curr_entry->next_entry;
-            curr_entry->address = address;
-            curr_entry->size = size;  
+            curr_entry->address = *address;
+            curr_entry->size = *size;  
         }
 
     } while (address != 0 || size != 0); 

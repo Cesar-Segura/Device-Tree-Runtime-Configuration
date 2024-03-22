@@ -8,7 +8,7 @@ struct fdt_memory_reserve_entry {
     uint64_t address;
     uint64_t size;
 
-    struct reserve_entry *next_entry; /* next entry in the memory reservation block */
+    struct fdt_memory_reserve_entry *next_entry; /* next entry in the memory reservation block */
 };
 
 /**
