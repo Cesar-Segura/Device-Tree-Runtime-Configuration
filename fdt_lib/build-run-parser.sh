@@ -6,7 +6,7 @@ make fdt_lib_test
 echo ""
 echo ""
 
-
+echo ""
 echo "Running parser test"
 echo ""
 

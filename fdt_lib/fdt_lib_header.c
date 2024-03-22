@@ -85,9 +85,6 @@ struct fdt_header *fdt_get_header_contents(const void *fdt)
 
 void print_fdt_header(struct fdt_header *header)
 {
-    // printf("normMagic: 0x%x\n", FDT_MAGIC);
-    // printf("oppMagic: 0x%x\n", OPP_MAGIC); 
-    
     printf("Printing Header of Device Tree\n"); 
     printf("Magic: 0x%x\n", header->magic);
     printf("Totalsize: %u\n", header->totalsize);

@@ -1,8 +1,8 @@
-#ifndef _FDT_PARSE_LIB_HEADER_
-#define _FDT_PARSE_LIB_HEADER_
+#ifndef _FDT_PARSE_LIB_HEADER_H_
+#define _FDT_PARSE_LIB_HEADER_H_
 
 /**
- * Functions for accessing the values in the fdt header
+ * @brief Functions for accessing the values in the fdt header
 */
 uint32_t fdt_get_header(const void *fdt, uint32_t field_offset);
 uint64_t fdt_get_reserve_entry_header(const void *fdt, uint32_t field_offset);
@@ -27,4 +27,4 @@ struct fdt_header *fdt_get_header_contents(const void *fdt);
 */
 void print_fdt_header(struct fdt_header *header);
 
-#endif /* _FDT_PARSE_LIB_HEADER */
+#endif /* _FDT_PARSE_LIB_HEADER_H_ */

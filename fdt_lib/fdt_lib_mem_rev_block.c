@@ -5,6 +5,57 @@
 
 #include "fdt_lib.h" 
 #include "fdt_lib_header.h"
+#include "fdt_lib_mem_rev_block.h"
+
+struct fdt_memory_reserve_entry *fdt_get_mem_resv_block(const void *fdt_blob)
+{
+    uint32_t address, size, curr_offset; 
+    struct fdt_memory_reserve_entry *entry_head, *curr_entry; 
+
+    curr_offset = fdt_get_off_mem_rsvmap(fdt_blob);
+    entry_head = (struct fdt_memory_reserve_entry *) malloc(sizeof(struct fdt_memory_reserve_entry)); 
+    curr_entry = NULL; 
+
+    do {
+        address = fdt_get_offset_in_blob(fdt_blob, curr_offset); 
+        curr_offset += sizeof(uint64_t);
+        size = fdt_get_offset_in_blob(fdt_blob, curr_offset); 
+        curr_offset += sizeof(uint64_t); 
+
+        if (curr_entry == NULL) {
+            entry_head->address = address;
+            entry_head->size = size; 
+            curr_entry = entry_head; 
+        } else {
+            curr_entry->next_entry = (struct fdt_memory_reserve_entry *) malloc(sizeof(struct fdt_memory_reserve_entry));
+            curr_entry = curr_entry->next_entry;
+            curr_entry->address = address;
+            curr_entry->size = size;  
+        }
+
+    } while (address != 0 || size != 0); 
+
+    return entry_head; 
+}
+
+void free_fdt_memory_reserve_entry(struct fdt_memory_reserve_entry *entry)
+{
+    if (entry == NULL) return;
+
+    free(entry->next_entry);
+    free(entry);
+    entry = NULL; 
+}
+
+void fdt_print_mem_resv_block(struct fdt_memory_reserve_entry *entry)
+{
+    while (entry != NULL) {
+        printf("Address: 0x%llx\n", entry->address);
+        printf("Size: %llu\n", entry->size); 
+        printf("\n"); 
+        entry = entry->next_entry; 
+    }
+}
 
 void fdt_parse_mem_resvblock(const void *fdt, uint32_t offset)
 {
