@@ -7,6 +7,10 @@ Structure of the code:
 - dts_files: Contains device tree source files
 - fdt_lib: Contains source code relating to the parsing of the device tree
 
+Command to run the parser test:
+- Change directories to fdt_lib
+- run ./build-run-parser.sh from the terminal
+
 # TODO:
 - Redo function that returns the memory reservation block info (right now the information is just printed, not stored)
 - Error check for malloc failures
