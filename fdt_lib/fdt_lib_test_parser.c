@@ -155,9 +155,6 @@ int main(int argc, char **argv)
     // test_fdt_get_one_node(fdt_blob); 
 
     fdt_print_device_tree(fdt_blob); 
- 
-    // fdt_parse_mem_resvblock(fdt_blob, header->off_mem_rsvmap); 
-
 
     /* Cleanup */
     fflush(stdin); 
