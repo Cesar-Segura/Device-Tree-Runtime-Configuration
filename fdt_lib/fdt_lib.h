@@ -2,10 +2,9 @@
 #define _FDT_PARSE_LIB_H_
 
 /**
- * Important macros used in the fdt 
+ * FDT macros
 */
 #define FDT_MAGIC 0xd00dfeed
-#define OPP_MAGIC (~FDT_MAGIC)
 
 #define FDT_BEGIN_NODE 0x1
 #define FDT_END_NODE 0x2
@@ -18,66 +17,34 @@
 #define FDT_ALIGN_ON(x, a) (((x) + (a - 1)) & ~(a - 1)) /* align the pointer "x" to an address that is a multiple of "a" */
 
 /**
- * @brief The layout of the header for the devicetree 
+ * @brief Represents the header of the devicetree 
  * All the headers fields are 32 bit integers, stored in big-endian format
 */
 struct fdt_header {
-    /** @brief 
-     * This field shall contain the value 0xd00dfeed (big-endian)
-    */
-    uint32_t magic;
 
-    /** @brief
-     * The total size in bytes of the devicetree data structure
-    */
-    uint32_t totalsize;
+    uint32_t magic; /* contains the value 0xd00dfeed (big-endian) */
 
-    /** @brief
-     * The offset in bytes of the structure block from the beginning of the header 
-    */
-    uint32_t off_dt_struct;
+    uint32_t totalsize; /* total size in bytes of the devicetree data structure */
 
-    /** @brief
-     * The offset in bytes of the strings block from the beginning of the header  
-    */ 
-    uint32_t off_dt_strings;
+    uint32_t off_dt_struct; /* offset in bytes of the structure block from the beginning of the header */
 
-    /** @brief
-     * The offset in bytes of the memory reservation block from the beginning of the header
-    */  
-    uint32_t off_mem_rsvmap;
+    uint32_t off_dt_strings; /* offset in bytes of the strings block from the beginning of the header */
 
-    /** @brief
-     * The version of the devicetree data structure
-     * (structure is 17 if using this struct)
-    */   
-    uint32_t version;
+    uint32_t off_mem_rsvmap; /* offset in bytes of the memory reservation block from the beginning of the header */
 
-    /** @brief
-     * The lowest version of the devicetree data structure with which the version used is backwards compatible
-    */ 
-    uint32_t last_comp_version;
+    uint32_t version; /* version of the devicetree data structure */
 
-    /** @brief
-     * The physical ID of the system’s boot CPU
-    */
-    uint32_t boot_cpuid_phys;
+    uint32_t last_comp_version; /* The lowest version of the devicetree data structure with which the version used is backwards compatible */
 
-    /** @brief 
-     * The length in bytes of the strings block section of the devicetree blob
-    */
-    uint32_t size_dt_strings;
+    uint32_t boot_cpuid_phys; /* The physical ID of the system’s boot CPU */
 
-    /** @brief
-     * The length in bytes of the structure block section of the devicetree blob.
-    */
-    uint32_t size_dt_struct;
+    uint32_t size_dt_strings; /* length in bytes of the strings block section of the devicetree blob */
+
+    uint32_t size_dt_struct; /* length in bytes of the structure block section of the devicetree blob */
 };
 
-/** @brief 
- * The memory reservation block consists of a list of pairs of 64-bit big-endian integers
- * Each uint64_t in the memory reservation block, and thus the memory reservation block as a whole, shall be located at an
- * 8-byte aligned offset from the beginning of the devicetree blob
+/** 
+ * @brief Represents one entry in the memory reservation block
 */
 struct fdt_reserve_entry {
     uint64_t address;
@@ -85,8 +52,7 @@ struct fdt_reserve_entry {
 };
 
 /**
- * @brief 
- * Structure representing a property in the device tree blob.
+ * @brief Represents a property in the device tree blob.
  * len: gives the length of the property's value in bytes 
  * nameoff: gives an offset into the strings block at which the property's name is stored
 */
