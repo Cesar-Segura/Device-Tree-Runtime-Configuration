@@ -12,7 +12,6 @@ Command to run the parser test:
 - run ./build-run-parser.sh from the terminal
 
 # TODO:
-- Redo function that returns the memory reservation block info (right now the information is just printed, not stored)
 - Error check for malloc failures
 - Reconsider placement of offset alignment functions
 - Figure out a better way of error propogation through the embedded functions
