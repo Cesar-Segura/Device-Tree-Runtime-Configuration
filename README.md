@@ -1,6 +1,6 @@
 # Device-Tree-Runtime-Configuration
 
-This repository contains code for a device tree runtime parser.
+This repository contains the code for the device tree runtime parser.
 
 Primary APIs:
 - fdt_lib_header.h: Interface for parsing the header of the device tree
