@@ -1,5 +1,5 @@
-#ifndef _FDT_PARSE_LIB_
-#define _FDT_PARSE_LIB_
+#ifndef _FDT_PARSE_LIB_H_
+#define _FDT_PARSE_LIB_H_
 
 /**
  * Important macros used in the fdt 
@@ -117,7 +117,7 @@ static inline uint32_t convert_32_to_big_endian(const uint32_t *pointer)
 }
 
 /**
- * @brief Convert the (64-bit) value pointed to by bit pointer to big endian format (64 bit value)
+ * @brief Convert the (64-bit) value pointed to by bit pointer to big endian format
 */
 static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
 {
@@ -133,4 +133,4 @@ static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
 }  
 
 
-#endif /* _FDT_PARSE_LIB */
+#endif /* _FDT_PARSE_LIB_H_ */

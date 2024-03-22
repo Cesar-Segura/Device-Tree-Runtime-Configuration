@@ -17,52 +17,6 @@ int test_fdt_header_functions(const void *fdt_blob)
     return 0; 
 }
 
-int test_fdt_get_token(const void *fdt_blob)
-{
-    /* Test to see if we can get a begin node tag: */
-    uint32_t struc_block_offset = fdt_get_off_dt_struct(fdt_blob);
-    uint32_t *next_offset = malloc(sizeof(uint32_t)); 
-
-    int token = fdt_get_next_token(fdt_blob, struc_block_offset, next_offset);
-    printf("Token: %d\n", token);
-
-    switch (token) {
-        case FDT_BEGIN_NODE: {
-            /* Get the string (node name) that comes after the begin node */
-            char *p; 
-            char *str_buffer = (char *) malloc(sizeof(char) * 50); // make room for a string of size 50
-            int off = 0; 
-            do {
-                uint32_t offset = *(next_offset++);
-                p = (char *) fdt_get_offset_in_blob(fdt_blob, offset);
-                str_buffer[off++] = *p; 
-            } while (p && (*p != '\0')); 
-            str_buffer[off] = '\0';
-
-            printf("Node name string: %s\n", str_buffer); 
-
-            /* cleanup */
-            free(str_buffer); 
-            break; 
-        }
-        case FDT_PROP: {
-            struct device_tree_property *dtp = (struct device_tree_property *) malloc(sizeof(struct device_tree_property)); 
-            dtp->len = convert_32_to_big_endian(fdt_get_offset_in_blob(fdt_blob, *next_offset)); 
-            printf("dtp->len: %u\n", dtp->len); 
-            dtp->nameoff = convert_32_to_big_endian(fdt_get_offset_in_blob(fdt_blob, *next_offset)); 
-            printf("dtp->nameoff: %u\n", dtp->nameoff); 
-
-            /* cleanup */
-            free (dtp);
-            break;
-        }
-        case FDT_END: {
-            break; 
-        } /* end switch */
-    } 
-    return 0; 
-}
-
 
 int test_fdt_get_one_node(const void *fdt_blob)
 {
@@ -115,6 +69,7 @@ int test_fdt_get_one_node(const void *fdt_blob)
                 printf("\n"); 
 
                 curr_offset += sizeof(struct device_tree_property);
+
                 /* print the property value */
                 printf("Property value: "); 
                 // char *ch; 
@@ -197,7 +152,9 @@ int main(int argc, char **argv)
     //     printf("Test failed: test_fdt_get_token\n"); 
     // }
 
-    test_fdt_get_one_node(fdt_blob); 
+    // test_fdt_get_one_node(fdt_blob); 
+
+    fdt_print_device_tree(fdt_blob); 
  
     // fdt_parse_mem_resvblock(fdt_blob, header->off_mem_rsvmap); 
 
