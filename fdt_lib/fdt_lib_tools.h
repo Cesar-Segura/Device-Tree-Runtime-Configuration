@@ -1,14 +1,21 @@
 #ifndef _FDT_LIB_TOOLS_H_
 #define _FDT_LIB_TOOLS_H_
 
+/**
+ * @brief Represents a single node property of a device node. 
+*/
 struct device_node_property {
     char* name;
     void *value;
-    int length;
+    int length; /* length of the value in bytes */
 
-    struct device_node_property *next_property;
+    struct device_node_property *next_property; /* pointer to the next property in a list of properties belonging to the same device node */
 };
 
+/**
+ * @brief Represents a single device node in the device tree.
+ * 
+*/
 struct device_tree_node {
     int is_root_node; 
 
@@ -17,11 +24,11 @@ struct device_tree_node {
     char *full_path;
     int phandle; 
 
-    struct device_node_property *device_properties; 
+    struct device_node_property *device_properties; /* list of properties belonging to this device node */
 
-    struct device_tree_node *parent_node;
-    struct device_tree_node *child_node;
-    struct device_tree_node *next_node;
+    struct device_tree_node *parent_node; /* pointer to single parent node (note: root has no parent) */
+    struct device_tree_node *child_node; /* pointer to list of child nodes */
+    struct device_tree_node *next_node; /* pointer to the next node in a list of nodes belonging to the same parent */
 };
 
 /**
