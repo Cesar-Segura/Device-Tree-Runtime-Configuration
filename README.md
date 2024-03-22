@@ -4,7 +4,7 @@ This repository contains the code for the device tree runtime parser.
 
 Primary APIs:
 - fdt_lib_header.h: Interface for parsing the header of the device tree
-- fdt_lib_mem_rev_block.h: Interface for parsing the memory reservation block
+- fdt_lib_mem_rev_block.h: Interface for parsing the memory reservation block of the device tree
 - fdt_lib_tools.h: Interface for parsing the structure block of the device tree
 - fdt_lib.h: Low-level bit manipulation, pointer offset management, and general FDT info
 
