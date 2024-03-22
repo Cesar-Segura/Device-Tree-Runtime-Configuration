@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g #-Wextra
+CFLAGS = -Wall -g 
 LDFLAGS =
 
 SRCS = fdt_lib_header.c fdt_lib_mem_rev_block.c fdt_lib_test_parser.c fdt_lib_tools.c
