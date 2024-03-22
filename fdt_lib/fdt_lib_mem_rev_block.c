@@ -33,7 +33,7 @@ struct fdt_memory_reserve_entry *fdt_get_mem_resv_block(const void *fdt_blob)
             curr_entry->size = *size;  
         }
 
-    } while (address != 0 || size != 0); 
+    } while (*address != 0 || *size != 0); 
 
     return entry_head; 
 }
