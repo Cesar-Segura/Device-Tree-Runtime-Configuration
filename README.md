@@ -8,7 +8,7 @@ Primary APIs:
 - fdt_lib_tools.h: Interface for parsing the structure block of the device tree
 - fdt_lib.h: Low-level bit manipulation, pointer offset management, and general FDT info
 
-Structure of the code:
+Structure of the code (by directory name):
 - dtb_files: Contains device tree binaries
 - dts_files: Contains device tree source files
 - fdt_lib: Contains source code relating to the parsing of the device tree
