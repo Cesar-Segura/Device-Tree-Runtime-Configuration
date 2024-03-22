@@ -2,6 +2,9 @@
 
 This repository contains code for a device tree runtime parser. The primary API that is used to parse the tree can be found in /fdt_lib/fdt_lib_tools.h
 
+Primary APIs:
+- fdt_lib_header.h: gives interface for parsing the header of the device tree
+
 Structure of the code:
 - dtb_files: Contains device tree binaries
 - dts_files: Contains device tree source files
