@@ -5,7 +5,7 @@ This repository contains code for a device tree runtime parser. The primary API 
 Structure of the code:
 - dtb_files: Contains device tree binaries
 - dts_files: Contains device tree source files
-- fdt_lib: Contains source code relating to the parsing of the device tree \n
+- fdt_lib: Contains source code relating to the parsing of the device tree
 
 # TODO:
 - Redo function that returns the memory reservation block info (right now the information is just printed, not stored)
