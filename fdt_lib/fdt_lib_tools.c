@@ -221,7 +221,7 @@ struct device_tree_node *fdt_get_root_node(const void *fdt_blob)
     struct device_tree_node *root_node; 
     
     root_node = (struct device_tree_node *) malloc(sizeof(struct device_tree_node));
-    root_node->is_root_node = 0;  
+    root_node->is_root_node = 1;  
     root_node->node_name = NULL;
     root_node->unit_address = NULL;
     root_node->full_path = NULL; 
