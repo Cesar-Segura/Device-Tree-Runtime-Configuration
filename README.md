@@ -22,6 +22,9 @@ Command to run the parser test:
 - run ./build-run-parser.sh from the terminal
 
 # TODO:
+// offset wrapped as own type and passed into function
+// general parsing API: fdt_iterator_next(), fdt_iterator_init()
+// better than static offset bc can have more than one thread of iteration
 - Error check for malloc failures
 - Reconsider placement of offset alignment functions
 - Figure out a better way of error propogation through the embedded functions
