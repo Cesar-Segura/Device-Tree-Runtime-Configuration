@@ -53,8 +53,33 @@ int fdt_get_token(const void *fdt_blob, iterator_t *iter)
 }
 
 
+static int _check_bad_token_offset(const void *fdt_blob, iterator_t *iter)
+{
+    uint32_t token;
+
+    token = convert_32_to_big_endian(fdt_get_offset_in_blob(fdt_blob, *iter));
+    switch (token) {
+        case FDT_PROP:
+            break;
+        case FDT_BEGIN_NODE:
+            break;
+        case FDT_END_NODE:
+            break;
+        case FDT_NOP:
+            break;
+        case FDT_END:
+            break;
+        default:
+            return 0;
+    }
+    return 1;
+}
+
+
 int fdt_skip_to_next_token(const void *fdt_blob, iterator_t *iter)
 {
+    if (!_check_bad_token_offset(fdt_blob, iter)) return -FDT_ERR_BAD_ARG;
+
 	int token;
     iterator_t curr_offset;
 
@@ -95,7 +120,7 @@ int fdt_skip_to_next_token(const void *fdt_blob, iterator_t *iter)
         }
         default: {
             DEBUG("ERROR: unexpected value for token in fdt_skip_to_next_token");
-            return 0;
+            return -FDT_ERR_UNKNOWN_TOKEN;
         }
     } 
 
@@ -109,13 +134,22 @@ int fdt_skip_to_next_token(const void *fdt_blob, iterator_t *iter)
 */
 
 
-const struct fdt_property *fdt_get_property(const void *fdt_blob, iterator_t *iter)
+const struct fdt_property *fdt_get_property(const void *fdt_blob, iterator_t *iter, int *err)
 {
+    if (!_check_bad_token_offset(fdt_blob, iter)) {
+        *err = -FDT_ERR_BAD_ARG;
+        return NULL;
+    }
+
     // iter points to the token, double check that this token is an FDT_PROP token
-    if (fdt_get_token(fdt_blob, iter) != FDT_PROP) return NULL;
+    if (fdt_get_token(fdt_blob, iter) != FDT_PROP) {
+        *err = -FDT_ERR_BAD_ARG;
+        return NULL;
+    }
 
 	struct fdt_property *property;
 	property = (struct fdt_property *) fdt_get_offset_in_blob(fdt_blob, *iter + FDT_TOKEN_SIZE);
+    *err = 0;
 	return property;
 }
 
@@ -150,6 +184,11 @@ uint32_t fdt_get_property_nameoff(const struct fdt_property *prop)
 
 static int fdt_first_property(const void *fdt_blob, iterator_t *iter)
 {
+    if (!_check_bad_token_offset(fdt_blob, iter)) return -FDT_ERR_BAD_ARG;
+
+    // assert that pointer points to beginning of fdt_property representation
+    if (fdt_get_token(fdt_blob, iter) != FDT_BEGIN_NODE) return -FDT_ERR_BAD_ARG;
+
     int token, node_depth;
     iterator_t curr_offset, prev_offset;
 
@@ -193,7 +232,7 @@ static int fdt_first_property(const void *fdt_blob, iterator_t *iter)
                     case CURR_NODE: {
                         // error with the structure of the device tree
                         // (FDT_END_NODE token coming before an expected FDT_BEGIN_TOKEN)
-                        return 0;
+                        return -FDT_ERR_BAD_STRUCTURE;
                     }
                     case CHILD_NODE: {
                         // end of this node; there are no properties
@@ -209,14 +248,14 @@ static int fdt_first_property(const void *fdt_blob, iterator_t *iter)
             case FDT_END: {
                 // error with the structure of the device tree 
                 // (FDT_END token reached before an FDT_END_NODE token)
-                return 0;
+                return -FDT_ERR_BAD_STRUCTURE;
             }
             case FDT_NOP: {
                 break;
             }
             default: {
                 DEBUG("ERROR: unexpected value for token in fdt_first_property");
-                return 0;
+                return -FDT_ERR_UNKNOWN_TOKEN;
             }
         } /* end switch token */
     } while (token != FDT_PROP);
@@ -229,13 +268,16 @@ int fdt_next_property(const void *fdt_blob, int is_first_prop, iterator_t *iter)
 {
     if (is_first_prop) return fdt_first_property(fdt_blob, iter);
 
+    if (!_check_bad_token_offset(fdt_blob, iter)) return -FDT_ERR_BAD_ARG;
+
+    // assert that pointer points to beginning of fdt_property representation
+    if (fdt_get_token(fdt_blob, iter) != FDT_PROP) return -FDT_ERR_BAD_ARG;
+
     int token;
     iterator_t prev_offset, curr_offset;
 
     /* skipping over the current property, get the offset of the next property */
     curr_offset = *iter;
-
-    if (fdt_get_token(fdt_blob, &curr_offset) != FDT_PROP) return 0; // assert that pointer points to fdt_property
 
     curr_offset += FDT_TOKEN_SIZE;
     uint32_t prop_value_len = fdt_get_prop_len_by_offset(fdt_blob, &curr_offset);
@@ -268,11 +310,11 @@ int fdt_next_property(const void *fdt_blob, int is_first_prop, iterator_t *iter)
             case FDT_END: {
                 // error: bad fdt structure 
                 // (FDT_END token found before end of node representation)
-                return 0;
+                return -FDT_ERR_BAD_STRUCTURE;
             }
             default: {
                 DEBUG("ERROR: unexpected value for token in fdt_next_property");
-                return 0;
+                return -FDT_ERR_UNKNOWN_TOKEN;
             }
         } /* end switch token */
 
@@ -287,20 +329,32 @@ int fdt_next_property(const void *fdt_blob, int is_first_prop, iterator_t *iter)
 */
 
 
-const char *fdt_get_node_name(const void *fdt_blob, iterator_t *iter)
+const char *fdt_get_node_name(const void *fdt_blob, iterator_t *iter, int *err)
 {
-    char *node_name;
-    
+    if (!_check_bad_token_offset(fdt_blob, iter)) {
+        *err = -FDT_ERR_BAD_ARG;
+        return NULL;
+    }
     /* ensure iter points to beginning of node */
-    if (fdt_get_token(fdt_blob, iter) != FDT_BEGIN_NODE) return 0;
+    if (fdt_get_token(fdt_blob, iter) != FDT_BEGIN_NODE) {
+        *err = -FDT_ERR_BAD_ARG;
+        return NULL;
+    }
 
+    char *node_name;
     node_name = (char *) fdt_get_offset_in_blob(fdt_blob, (*iter + FDT_TOKEN_SIZE));
+    *err = 0;
     return node_name;
 }
 
 
 static int fdt_first_child_node(const void *fdt_blob, iterator_t *iter)
 {
+    if (!_check_bad_token_offset(fdt_blob, iter)) return -FDT_ERR_BAD_ARG;
+
+    // ensure that this offset points to the beginning of a node representation 
+    if (fdt_get_token(fdt_blob, iter) != FDT_BEGIN_NODE) return -FDT_ERR_BAD_ARG;
+
     int token, node_depth, not_found;
     iterator_t prev_offset, curr_offset;
 
@@ -337,7 +391,7 @@ static int fdt_first_child_node(const void *fdt_blob, iterator_t *iter)
                     case CURR_NODE: {
                         // error: bad structure of fdt
                         // (found FDT_END_NODE token before an expected FDT_BEGIN_NODE token)
-                        return 0;
+                        return -FDT_ERR_BAD_STRUCTURE;
                     }
                     case CHILD_NODE: {
                         // no child nodes, end of current node representation
@@ -359,7 +413,11 @@ static int fdt_first_child_node(const void *fdt_blob, iterator_t *iter)
             case FDT_END: {
                 // error: bad structure of fdt
                 // (found FDT_END before end of node representation - FDT_END_NODE)
-                return 0;
+                return -FDT_ERR_BAD_STRUCTURE;
+            }
+            default: {
+                DEBUG("ERROR: unexpected value for token in fdt_first_child_node");
+                return -FDT_ERR_UNKNOWN_TOKEN;
             }
         } /* end switch token */
 
@@ -372,6 +430,11 @@ static int fdt_first_child_node(const void *fdt_blob, iterator_t *iter)
 int fdt_next_child_node(const void *fdt_blob, int is_first_child_node, iterator_t *iter)
 {
     if (is_first_child_node) return fdt_first_child_node(fdt_blob, iter);
+
+    if (!_check_bad_token_offset(fdt_blob, iter)) return -FDT_ERR_BAD_ARG;
+
+    // ensure that this offset points to the beginning of a node representation
+    if (fdt_get_token(fdt_blob, iter) != FDT_BEGIN_NODE) return -FDT_ERR_BAD_ARG;
 
     /* get the sibling node of the node at offset iter */
     int token, next_node_depth, not_found;
@@ -398,7 +461,7 @@ int fdt_next_child_node(const void *fdt_blob, int is_first_child_node, iterator_
                     case -1: {
                         // error: bad structure of fdt 
                         // (found FDT_END_NODE token before expected FDT_BEGIN_NODE token)
-                        return 0;
+                        return -FDT_ERR_BAD_STRUCTURE;
                     }
                     case 0: {
                         // found the end of the current node representation
@@ -419,11 +482,11 @@ int fdt_next_child_node(const void *fdt_blob, int is_first_child_node, iterator_
             case FDT_END: {
                 // error: bad structure of fdt
                 // (premature end of node representation in fdt)
-                return 0;
+                return -FDT_ERR_BAD_STRUCTURE;
             }
             default: {
                 DEBUG("ERROR: unexpected value for token in fdt_next_child_node (1st loop)");
-                return 0;
+                return -FDT_ERR_UNKNOWN_TOKEN;
             }
         } /* end switch token */
     } while (not_found);
@@ -453,7 +516,7 @@ int fdt_next_child_node(const void *fdt_blob, int is_first_child_node, iterator_
             case FDT_PROP: {
                 // error: bad structure of fdt
                 // (found FDT_PROP, but not within a node representation)
-                return 0;
+                return -FDT_ERR_BAD_STRUCTURE;
             }
             case FDT_END_NODE: {
                 // ambiguous
@@ -463,7 +526,7 @@ int fdt_next_child_node(const void *fdt_blob, int is_first_child_node, iterator_
             }
             default: {
                 DEBUG("ERROR: unexpected value for token in fdt_next_child_node (2nd loop)");
-                return 0;
+                return -FDT_ERR_UNKNOWN_TOKEN;
             }
         } /* end switch token */
     } while (not_found);
