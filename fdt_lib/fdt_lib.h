@@ -12,6 +12,11 @@
 #define FDT_NOP 0x4
 #define FDT_END 0x9
 
+/**
+ * FDT errors
+*/
+#define FDT_BAD_NODE_END 0x1 /* Returned when a FDT_END token is found before FDT_END_NODE */
+
 #define FDT_TOKEN_SIZE sizeof(uint32_t) /* size of a token in the structure block */
 
 #define FDT_ALIGN_ON(x, a) (((x) + (a - 1)) & ~(a - 1)) /* align the pointer "x" to an address that is a multiple of "a" */
@@ -56,9 +61,10 @@ struct fdt_reserve_entry {
  * len: gives the length of the property's value in bytes 
  * nameoff: gives an offset into the strings block at which the property's name is stored
 */
-struct device_tree_property {
+struct fdt_property {
     uint32_t len;
     uint32_t nameoff; 
+	uint8_t value[]; // value of the property comes immediately after the nameoffset
 };
 
 /**
@@ -96,7 +102,12 @@ static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
             | ((uint64_t) bytes[5] << 16)
             | ((uint64_t) bytes[6] << 8)
             | (bytes[7]); 
-}  
+} 
+
+/**
+ * @brief An iterator to keep track of the offset for a particular iteration
+*/
+typedef uint32_t iterator_t;
 
 
 #endif /* _FDT_PARSE_LIB_H_ */
