@@ -2,9 +2,9 @@ CC = gcc
 CFLAGS = -Wall -g 
 LDFLAGS =
 
-SRCS = fdt_lib_header.c fdt_lib_mem_rev_block.c fdt_lib_test_parser.c fdt_lib_tools.c
+SRCS = fdt_lib_header.c fdt_lib_mem_rev_block.c fdt_lib_test_parser.c fdt_lib_tools.c fdt_lib_parse.c
 OBJS = $(SRCS:.c=.o)
-DEPS = fdt_lib.h fdt_lib_header.h fdt_lib_mem_rev_block.h fdt_lib_tools.h
+DEPS = fdt_lib.h fdt_lib_header.h fdt_lib_mem_rev_block.h fdt_lib_tools.h fdt_lib_parse.h
 
 TARGET = fdt_lib_test
 

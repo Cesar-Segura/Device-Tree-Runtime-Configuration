@@ -102,28 +102,46 @@ static void fdt_print_property(const void *fdt_blob, const struct fdt_property *
 */
 static void sample_print_properties(const void *fdt_blob, iterator_t *node_offset)
 {
-    int is_first_prop;
+    int is_first_prop, err, result;
     const struct fdt_property *prop;
     iterator_t curr_offset = *node_offset;
 
     is_first_prop = 1;
-    while (fdt_next_property(fdt_blob, is_first_prop, &curr_offset)) {
+    err = 0;
+    while ((result = fdt_next_property(fdt_blob, is_first_prop, &curr_offset) > 0)) {
         is_first_prop = 0;
-        prop = fdt_get_property(fdt_blob, &curr_offset);
-        fdt_print_property(fdt_blob, prop);
+        prop = fdt_get_property(fdt_blob, &curr_offset, &err);
+        if (err == 0) {
+            fdt_print_property(fdt_blob, prop);
+        } else {
+            printf("ERROR: error code %d\n", -err);
+            return;
+        }
+    }
+
+    if (result < 0) {
+        printf("ERROR: error code %d\n", -err);
+        return;
     }
 }
 
 static void sample_print_node(const void *fdt_blob, iterator_t *node_offset)
 {
-    int is_first_child_node;
+    int is_first_child_node, result;
     iterator_t curr_offset;
     
     curr_offset = *node_offset;
 
     DEBUG("Printing node name");
     /* Print name */
-    printf("%s\n", fdt_get_node_name(fdt_blob, &curr_offset));
+    int err = 0;
+    const char *node_name = fdt_get_node_name(fdt_blob, &curr_offset, &err);
+    if (err == 0) {
+        printf("%s\n", node_name);
+    } else {
+        printf("ERROR: error code %d\n", -err);
+        return;
+    }
 
     DEBUG("Printing node properties");
     /* Print properties */
@@ -134,9 +152,13 @@ static void sample_print_node(const void *fdt_blob, iterator_t *node_offset)
 
     is_first_child_node = 1;
 
-    while(fdt_next_child_node(fdt_blob, is_first_child_node, &curr_offset)) {
+    while((result = fdt_next_child_node(fdt_blob, is_first_child_node, &curr_offset) > 0)) {
         is_first_child_node = 0;
         sample_print_node(fdt_blob, &curr_offset);
+    }
+
+    if (result < 0) {
+        printf("ERROR: erro code %d\n", -result);
     }
 
     DEBUG("DONE Printing subnodes");

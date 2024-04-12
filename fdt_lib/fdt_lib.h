@@ -1,11 +1,13 @@
 #ifndef _FDT_PARSE_LIB_H_
 #define _FDT_PARSE_LIB_H_
 
-/**
- * FDT macros
-*/
+#include <stdint.h>
+
 #define FDT_MAGIC 0xd00dfeed
 
+/**
+ * FDT token macros
+*/
 #define FDT_BEGIN_NODE 0x1
 #define FDT_END_NODE 0x2
 #define FDT_PROP 0x3 
@@ -13,9 +15,11 @@
 #define FDT_END 0x9
 
 /**
- * FDT errors
+ * FDT error macros
 */
-#define FDT_BAD_NODE_END 0x1 /* Returned when a FDT_END token is found before FDT_END_NODE */
+#define FDT_ERR_BAD_STRUCTURE 0x12 /* Returned when a FDT_END token is found before FDT_END_NODE */
+#define FDT_ERR_BAD_ARG 0x13 /* bad argument passed as a parameter to a function */
+#define FDT_ERR_UNKNOWN_TOKEN 0x14 /* parser read a token that does not match the 5 tokens above */
 
 #define FDT_TOKEN_SIZE sizeof(uint32_t) /* size of a token in the structure block */
 

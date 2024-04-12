@@ -49,9 +49,24 @@ const char *fdt_get_string(const void *fdt_blob, iterator_t iter);
 int fdt_get_token(const void *fdt_blob, iterator_t *iter);
 
 /**
+ * @brief Checks if the data at the given offset (iter) is a token.
+ * 
+ * Returns:
+ *      1 if the data is a token 
+ *      0 otherwise
+*/
+static int _check_bad_token_offset(const void *fdt_blob, iterator_t *iter);
+
+/**
  * @brief Get the next token from the given offset iter.
- * Returns the token found.
- * Note: updates iter to point to the beginning of the next token 
+ * 
+ * Note: updates iter to point to the beginning of the next token.
+ * Note: upon error, iter is not changed.
+ * 
+ * Returns:
+ *      One of the 5 FDT tokens 
+ *      OR
+ *      < 0 if there is an error 
 */
 int fdt_skip_to_next_token(const void *fdt_blob, iterator_t *iter);
 
@@ -62,8 +77,17 @@ int fdt_skip_to_next_token(const void *fdt_blob, iterator_t *iter);
 /**
  * @brief Get the property at the current offset (iter)
  * Note: does not change the iter offset
+ * 
+ * param err: holds an error code (if there is an error)
+ *      0 if no error
+ *      < 0 if error 
+ * 
+ * Returns:
+ *      pointer to the beginning of an fdt_property struct
+ *      OR
+ *      NULL if there is an error (err populated with the error code)
 */
-const struct fdt_property *fdt_get_property(const void *fdt_blob, iterator_t *iter);
+const struct fdt_property *fdt_get_property(const void *fdt_blob, iterator_t *iter, int *err);
 
 /**
  * @brief Return the length value of the property at the offset iter.
@@ -88,20 +112,26 @@ uint32_t fdt_get_property_nameoff(const struct fdt_property *prop);
  * 
  * Returns: 
  *      1 if the node has a property
- *          - iter holds the offset of the property from the beginning of the node
- *      -1 if there are no properties.
- *          - iter holds the offset to the next token 
+ *          * iter holds the offset of the property from the beginning of the node
+ *      0 if there are no properties.
+ *          * iter holds the offset to the next token
+ *      < 0 if there is an error
+ *          * iter remains unchanged 
 */
 static int fdt_first_property(const void *fdt_blob, iterator_t *iter);
 
 /**
  * @brief Get the offset of the next property of this node.
- * Note: changes iter only if a property is found.
  * 
  * param iter: gives the offset of the beginning of the current property
  * 
- * Returns: the offset of the next property (>= 0)
- * or -1 if there are no more properties.
+ * Returns: 
+ *      1 if there is another property found
+ *          * iter holds the offset of the property from the FDT_PROP token
+ *      0 if there are no properties.
+ *          * iter remains unchanged
+ *      < 0 if there is an error
+ *          * iter remains unchanged
 */
 int fdt_next_property(const void *fdt_blob, int is_first_prop, iterator_t *iter);
 
@@ -114,35 +144,49 @@ int fdt_next_property(const void *fdt_blob, int is_first_prop, iterator_t *iter)
  * 
  * param iter: gives the offset of the beginning of the current node
  * 
- * Returns: pointer to the name string (null terminated)
+ * param err: holds the error code (if any)
+ *      0 if no error 
+ *      < 0 if error found
  * 
- * TODO: check for errors? 
+ * Returns: 
+ *      pointer to the name string (null terminated)
+ *      OR 
+ *      NULL if there is an error
+ *          * err holds the error code
+ * 
 */
-const char *fdt_get_node_name(const void *fdt_blob, iterator_t *iter);
+const char *fdt_get_node_name(const void *fdt_blob, iterator_t *iter, int *err);
 
 /**
  * @brief Get the offset of the first child node
  * 
- * param iter: the offset of the current node within the device tree
+ * param iter: the offset of the current node, starting from FDT_BEGIN_NODE token
+ *      - Holds a pointer 
  * 
- * returns: 
- *      1 if there are any child nodes
- *          - iter points to this node
- *      -1 if there are no child nodes
- *          - iter points to the next token
+ * Returns: 
+ *      1 if a child node is found
+ *          * iter holds the offset of the property from the FDT_BEGIN_NODE token
+ *      0 if there are no children nodes.
+ *          * iter remains unchanged
+ *      < 0 if there is an error
+ *          * iter remains unchanged
 */
 static int fdt_first_child_node(const void *fdt_blob, iterator_t *iter);
 
 /**
- * @brief Get the offset of the next child node
+ * @brief Get the offset of the next child node.
+ * Note: Essentially, we are getting the sibling node of the current node.
+ *      - Get the next node at the same depth as the current node
  * 
  * param iter: the offset of the current child node within the device tree
  * 
- * returns: 
- *      1 if there are any more child nodes
- *          - iter points to this node
- *      -1 if there are no more child nodes
- *          - iter points to the next token
+ * Returns: 
+ *      1 if another child node is found
+ *          * iter holds the offset of the property from the FDT_BEGIN_NODE token
+ *      0 if there are no child nodes remaining.
+ *          * iter remains unchanged
+ *      < 0 if there is an error
+ *          * iter remains unchanged
 */
 int fdt_next_child_node(const void *fdt_blob, int is_first_child_node, iterator_t *iter);
 
