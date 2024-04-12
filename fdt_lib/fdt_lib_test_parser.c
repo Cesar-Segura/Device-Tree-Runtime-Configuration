@@ -159,6 +159,7 @@ static void sample_print_node(const void *fdt_blob, iterator_t *node_offset)
 
     if (result < 0) {
         printf("ERROR: erro code %d\n", -result);
+        return;
     }
 
     DEBUG("DONE Printing subnodes");
@@ -170,6 +171,7 @@ static void sample_print_node(const void *fdt_blob, iterator_t *node_offset)
 */
 static void print_struct_block(const void *fdt_blob)
 {
+    // have this function as an init function for iterator
 	iterator_t iter;
     struct fdt_header header;
     int token, root_node_not_found;

@@ -113,5 +113,15 @@ static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
 */
 typedef uint32_t iterator_t;
 
+// include more details for iterator
+// store offset to current node's begin token
+// hide iterator details behind the iterator struct 
+typedef struct {
+    uint32_t curr_offset;
+    uint32_t node_begin_offset;
+} new_iterator_t;
+
+// iterator function that starts at the beginning of the root node 
+
 
 #endif /* _FDT_PARSE_LIB_H_ */
