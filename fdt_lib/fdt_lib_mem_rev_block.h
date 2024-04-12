@@ -2,28 +2,19 @@
 #define _FDT_PARSE_LIB_MEM_REV_BLOCK_H_
 
 /**
- * @brief Represents a single entry in the memory reservation block
+ * @brief Get the next reserve entry at the offset indicated by iter.
+ * Update the offset to the next entry.
 */
-struct fdt_memory_reserve_entry {
-    uint64_t address;
-    uint64_t size;
-
-    struct fdt_memory_reserve_entry *next_entry; /* next entry in the memory reservation block */
-};
+const struct fdt_reserve_entry *fdt_next_reserve_entry(const void *fdt_blob, iterator_t *iter);
 
 /**
- * @brief Returns the memory reserve entries from the memory reservation block 
+ * @brief Get the address value of an fdt_reserve_entry struct.
 */
-struct fdt_memory_reserve_entry *fdt_get_mem_resv_block(const void *fdt_blob);
+uint64_t fdt_get_resv_entry_addr(const struct fdt_reserve_entry *entry);
 
 /**
- * @brief Frees the memory of a list of fdt_memory_reserve_entry structs
+ * @brief Get the size value of an fdt_reserve_entry struct.
 */
-void free_fdt_memory_reserve_entry(struct fdt_memory_reserve_entry *entry);
-
-/**
- * @brief Old implementation, will remove later
-*/
-void fdt_parse_mem_resvblock(const void *fdt, uint32_t offset);
+uint64_t fdt_get_resv_entry_size(const struct fdt_reserve_entry *entry);
 
 #endif /* _FDT_PARSE_LIB_MEM_REV_BLOCK_H_ */
