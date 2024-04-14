@@ -22,13 +22,4 @@ Command to run the parser test:
 - run ./build-run-parser.sh from the terminal
 
 # TODO:
-- The code needs to be refactored to include an iterator object
-- This iterator object will hold an offset (and other attributes) in it
-- iterator passed into each function
-- better than static offset because we can have more than one thread of iteration
-- general parsing API: fdt_iterator_next(), fdt_iterator_init()
-- implement offset wrapped as own type and passed into function
-- Other items:
-	- Reconsider placement of offset alignment functions
-	- Figure out a better way of error propogation through the embedded functions
-	- Backwards compatibility with older versions of device tree
+- Backwards compatibility with older versions of device tree
