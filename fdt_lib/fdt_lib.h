@@ -1,5 +1,5 @@
-#ifndef _FDT_PARSE_LIB_H_
-#define _FDT_PARSE_LIB_H_
+#ifndef _FDT_LIB_H_
+#define _FDT_LIB_H_
 
 #include <stdint.h>
 
@@ -20,6 +20,7 @@
 #define FDT_ERR_BAD_STRUCTURE 0x12 /* Returned when a FDT_END token is found before FDT_END_NODE */
 #define FDT_ERR_BAD_ARG 0x13 /* bad argument passed as a parameter to a function */
 #define FDT_ERR_UNKNOWN_TOKEN 0x14 /* parser read a token that does not match the 5 tokens above */
+#define FDT_ERR_NO_ROOT_NODE 0x15 /* no root node found in the entire fdt */
 
 #define FDT_TOKEN_SIZE sizeof(uint32_t) /* size of a token in the structure block */
 
@@ -72,8 +73,14 @@ struct fdt_property {
 };
 
 /**
- * @brief Returns a pointer to the given offset in the fdt blob. The offset is assumed to be in terms of number of bytes
- * The offset is assumed to be the offset from the beginning of the fdt blob itself. 
+ * @brief Returns a pointer to the given offset in the fdt blob. 
+ * 
+ * The offset should be in terms of number of bytes.
+ * 
+ * @param fdt_blob pointer to the beginning of the device tree 
+ * @param offset given offset in the blob
+ * 
+ * @return pointer to the given offset in the blob.
 */
 static inline const void *fdt_get_offset_in_blob(const void *fdt_blob, uint32_t offset)
 {
@@ -82,6 +89,10 @@ static inline const void *fdt_get_offset_in_blob(const void *fdt_blob, uint32_t 
 
 /**
  * @brief Convert the (32-bit) value pointed to by pointer to big endian format
+ * 
+ * @param pointer pointer to a 32-bit value
+ * 
+ * @return 32-bit value in big endian format.
 */
 static inline uint32_t convert_32_to_big_endian(const uint32_t *pointer)
 {
@@ -94,6 +105,10 @@ static inline uint32_t convert_32_to_big_endian(const uint32_t *pointer)
 
 /**
  * @brief Convert the (64-bit) value pointed to by bit pointer to big endian format
+ * 
+ * @param pointer pointer to a 64-bit value
+ * 
+ * @return 64-bit value in big endian format.
 */
 static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
 {
@@ -106,22 +121,38 @@ static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
             | ((uint64_t) bytes[5] << 16)
             | ((uint64_t) bytes[6] << 8)
             | (bytes[7]); 
-} 
+}
 
 /**
- * @brief An iterator to keep track of the offset for a particular iteration
+ * @brief An object representing a given iteration over the device tree.
 */
-typedef uint32_t iterator_t;
+struct fdt_iter {
+    int offset; // Current offset in the device tree binary.
+    const void *fdt_blob; // pointer to beginning of device tree binary.
+};
 
-// include more details for iterator
-// store offset to current node's begin token
-// hide iterator details behind the iterator struct 
-typedef struct {
-    uint32_t curr_offset;
-    uint32_t node_begin_offset;
-} new_iterator_t;
+/**
+ * @brief Initialize an fdt_iter object 
+ * 
+ * @param iter pointer to the fdt_iter object to initialize
+ * @param offset offset in the device tree binary that the pointer will start at
+*/
+static inline void fdt_iter_init(struct fdt_iter *iter, uint32_t offset, const void *fdt_blob)
+{
+    iter->offset = offset;
+    iter->fdt_blob = fdt_blob;
+}
 
-// iterator function that starts at the beginning of the root node 
+/**
+ * @brief Copy all the data from src object to dest object
+ * 
+ * @param dest iterator object that will copy from src object.
+ * @param src iterator object being copied into dest.
+*/
+static inline void fdt_iter_dup(struct fdt_iter *dest, struct fdt_iter *src)
+{
+    dest->offset = src->offset;
+    dest->fdt_blob = src->fdt_blob;
+}
 
-
-#endif /* _FDT_PARSE_LIB_H_ */
+#endif /* _FDT_LIB_H_ */

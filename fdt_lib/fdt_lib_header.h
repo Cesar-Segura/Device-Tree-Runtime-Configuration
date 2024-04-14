@@ -1,30 +1,39 @@
-#ifndef _FDT_PARSE_LIB_HEADER_H_
-#define _FDT_PARSE_LIB_HEADER_H_
+#ifndef _FDT_LIB_HEADER_H_
+#define _FDT_LIB_HEADER_H_
 
 /**
  * @brief Functions for accessing the values in the fdt header
+ * 
+ * @param fdt pointer to the beginning of the device tree
 */
-uint32_t fdt_get_header(const void *fdt, uint32_t field_offset);
-uint64_t fdt_get_reserve_entry_header(const void *fdt, uint32_t field_offset);
+
+/** @brief Get the "magic" field of the fdt_header struct. */
 uint32_t fdt_get_magic(const void *fdt);
+/** @brief Get the "totalsize" field of the fdt_header struct. */
 uint32_t fdt_get_totalsize(const void *fdt) ;
+/** @brief Get the "off_dt_struct" field of the fdt_header struct. */
 uint32_t fdt_get_off_dt_struct(const void *fdt);
+/** @brief Get the "off_dt_strings" field of the fdt_header struct. */
 uint32_t fdt_get_off_dt_strings(const void *fdt);
+/** @brief Get the "off_mem_rsvmap" field of the fdt_header struct. */
 uint32_t fdt_get_off_mem_rsvmap(const void *fdt);
+/** @brief Get the "version" field of the fdt_header struct. */
 uint32_t fdt_get_version(const void *fdt);
+/** @brief Get the "last_comp_version" field of the fdt_header struct. */
 uint32_t fdt_get_last_comp_version(const void *fdt);
+/** @brief Get the "boot_cpuid_phys" field of the fdt_header struct. */
 uint32_t fdt_get_boot_cpuid_phys(const void *fdt);
+/** @brief Get the "size_dt_strings" field of the fdt_header struct. */
 uint32_t fdt_get_size_dt_strings(const void *fdt);
+/** @brief Get the "size_dt_struct" field of the fdt_header struct. */
 uint32_t fdt_get_size_dt_struct(const void *fdt);
 
 /**
  * @brief Get the contents of the header struct and store them in the return struct
+ * 
+ * @param fdt pointer to beginning of fdt in memory
+ * @param header pointer to a (unpopulated) fdt_header struct
 */
-struct fdt_header *fdt_get_header_contents(const void *fdt);
+void fdt_get_header_contents(const void *fdt, struct fdt_header *header);
 
-/**
- * @brief Print the contents of the header struct
-*/
-void print_fdt_header(struct fdt_header *header);
-
-#endif /* _FDT_PARSE_LIB_HEADER_H_ */
+#endif /* _FDT_LIB_HEADER_H_ */
