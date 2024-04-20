@@ -1,6 +1,12 @@
 #ifndef _FDT_LIB_TOOLS_H_
 #define _FDT_LIB_TOOLS_H_
 
+
+/**
+ * Got a working implementation!
+ * NOTE: need to update the definitions for these with the new API
+*/
+
 /**
  * Interacting with the string block
 */
@@ -27,7 +33,7 @@ const char *fdt_get_string(const void *fdt_blob, int offset);
  * @param iter FDT iterator object; holds the offset of fdt_property.
  * @return pointer to fdt_property OR null if there is an error
 */
-const struct fdt_property *fdt_get_property(struct fdt_iter *iter, int *err);
+const struct fdt_property *fdt_get_property(const void *fdt_blob, int offset, int *err);
 
 /**
  * @brief Return the length field of fdt_property struct at the offset.
@@ -68,68 +74,59 @@ uint32_t fdt_get_property_len(const struct fdt_property *prop);
 uint32_t fdt_get_property_nameoff(const struct fdt_property *prop);
 
 /**
- * @brief Get the offset of the first property for the device node at the given iteration.
- * 
- * Note: The offset in iter is NOT changed if there is an error. 
- * Otherwise, the offset points to the next token after the first property.
- * 
- * @param iter FDT iterator object; holds the offset of the current device node in the device tree.
- * @return 1 if the node has a property; 0 if there are no properties; < 0 if there is an error
-*/
-int fdt_first_property(struct fdt_iter *iter);
-
-/**
- * @brief Get the offset of the next property in the device tree.
- * 
- * Note: the offset of iterator object is NOT changed if there is an error. 
- * Otherwise, the offset points to the next token after the current property.
- * 
- * @param iter FDT iterator object; holds the offset of the current property.
- * @return 1 if another property is found; 0 if no more properties; < 0 if there is an error.
-*/
-int fdt_next_property(struct fdt_iter *iter);
-
-/**
  * @brief Get the name of the node at the given offset.
  * 
- * @param iter FDT iterator object; holds the given offset.
+ * @param fdt_blob Pointer to beginning of devicetree in memory.
+ * @param offset offset of node within devicetree
  * @param err Holds the error code of the function (if there is an error).
+ * 
  * @return pointer to the name of the node OR null if there is an error.
 */
-const char *fdt_get_node_name(struct fdt_iter *iter, int *err);
+const char *fdt_get_node_name(const void *fdt_blob, int offset, int *err);
 
 /**
- * @brief Point the FDT iterator object to the root node of the fdt.
+ * @brief Return the offset of the root node.
  * 
- * Does not initialize iter if there is an error.
- * 
- * @param iter uninitialized FDT iterator object.
  * @param fdt_blob pointer to the beginning of the fdt in memory.
- * @return 1 if the root node was found; < 0 if there was an error.
+ * 
+ * @return offset if the node was found; < 0 if there was an error.
 */
-int fdt_find_root(struct fdt_iter *iter, const void *fdt_blob);
+int fdt_find_root(const void *fdt_blob);
+
+typedef enum {
+    CHILD_NODES = 0,
+    PROPERTIES
+} fdt_iter_type_t;
 
 /**
- * @brief Get the offset of this node's first child node
- * 
- * Note: the offset of iterator object is NOT changed if there is an error. 
- * Otherwise, the offset points to the next token after the first child node.
- * 
- * @param iter FDT iterator object; holds the offset of the current node.
- * @return 1 if a child node is found; 0 if there are no more children left; < 0 if there is an error.
+ * @brief An object representing a given iteration over the device tree.
 */
-int fdt_first_child_node(struct fdt_iter *iter);
+struct fdt_iter {
+    int offset; // Current offset in the device tree binary.
+    int end_struct_block; // holds the offset of the end of the struct block
+    unsigned int num_iterations; // current number of iterations
+    fdt_iter_type_t type; // what type of devicetree object are we iterating over
+    const void *fdt_blob; // pointer to beginning of device tree binary.
+};
 
 /**
- * @brief Get the offset of the sibling node (the next node representation in the device tree).
- * This is equivalent to getting the next node that is at the same depth in the tree as the current node.
+ * @brief Initialize an fdt_iter object 
  * 
- * Note: the offset of iterator object is NOT changed if there is an error. 
- * Otherwise, the offset points to the next token after the current child node.
- * 
- * @param iter FDT iterator object; holds the offset of the current node.
- * @return 1 if another node is found; 0 if there are no more sibling nodes left; < 0 if there is an error.
+ * @param iter pointer to the fdt_iter object to initialize
+ * @param type the type of devicetree object we're iterating over (child node, property)
+ * @param offset offset in the device tree binary that the pointer will start at
 */
-int fdt_next_child_node(struct fdt_iter *iter);
+void fdt_iter_init(struct fdt_iter *iter, uint32_t offset, fdt_iter_type_t type, const void *fdt_blob);
+
+/**
+ * @brief Given an iterator object pointing to the beginning of a node,
+ * get the next object of the specified type (child node or property) 
+ * 
+ * @param iter FDT iterator object, holds the offset of the current device node in the device tree.
+ * @param type The type of object the user wants to iterate over.
+ * 
+ * @return The offset within the devicetree of the next object in the iteration, or < 0 if error.
+*/
+int fdt_iter_get_next(struct fdt_iter *iter);
 
 #endif /* _FDT_LIB_TOOLS_H_ */

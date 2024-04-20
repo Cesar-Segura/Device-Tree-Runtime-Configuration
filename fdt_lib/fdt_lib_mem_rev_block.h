@@ -9,7 +9,7 @@
  * @param iter FDT iterator object; holds the given offset.
  * @return pointer to fdt_reserve_entry struct at the given offset.
 */
-const struct fdt_reserve_entry *fdt_next_reserve_entry(struct fdt_iter *iter);
+const struct fdt_reserve_entry *fdt_next_reserve_entry(const void *fdt_blob, int *offset);
 
 /**
  * @brief Get the address field of the given fdt_reserve_entry struct.

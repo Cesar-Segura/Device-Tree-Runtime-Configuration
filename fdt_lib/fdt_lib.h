@@ -22,6 +22,8 @@
 #define FDT_ERR_UNKNOWN_TOKEN 0x14 /* parser read a token that does not match the 5 tokens above */
 #define FDT_ERR_NO_ROOT_NODE 0x15 /* no root node found in the entire fdt */
 
+#define FDT_ERR_DEBUG_PARSER 0x16 /* error value when there is a problem with the parser itself (for debugging) */
+
 #define FDT_TOKEN_SIZE sizeof(uint32_t) /* size of a token in the structure block */
 
 #define FDT_ALIGN_ON(x, a) (((x) + (a - 1)) & ~(a - 1)) /* align the pointer "x" to an address that is a multiple of "a" */
@@ -121,38 +123,6 @@ static inline uint64_t convert_64_to_big_endian(const uint64_t *pointer)
             | ((uint64_t) bytes[5] << 16)
             | ((uint64_t) bytes[6] << 8)
             | (bytes[7]); 
-}
-
-/**
- * @brief An object representing a given iteration over the device tree.
-*/
-struct fdt_iter {
-    int offset; // Current offset in the device tree binary.
-    const void *fdt_blob; // pointer to beginning of device tree binary.
-};
-
-/**
- * @brief Initialize an fdt_iter object 
- * 
- * @param iter pointer to the fdt_iter object to initialize
- * @param offset offset in the device tree binary that the pointer will start at
-*/
-static inline void fdt_iter_init(struct fdt_iter *iter, uint32_t offset, const void *fdt_blob)
-{
-    iter->offset = offset;
-    iter->fdt_blob = fdt_blob;
-}
-
-/**
- * @brief Copy all the data from src object to dest object
- * 
- * @param dest iterator object that will copy from src object.
- * @param src iterator object being copied into dest.
-*/
-static inline void fdt_iter_dup(struct fdt_iter *dest, struct fdt_iter *src)
-{
-    dest->offset = src->offset;
-    dest->fdt_blob = src->fdt_blob;
 }
 
 #endif /* _FDT_LIB_H_ */
