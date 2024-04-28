@@ -1,15 +1,5 @@
-#ifndef _FDT_LIB_TOOLS_H_
-#define _FDT_LIB_TOOLS_H_
-
-
-/**
- * Got a working implementation!
- * NOTE: need to update the definitions for these with the new API
-*/
-
-/**
- * Interacting with the string block
-*/
+#ifndef _FDT_LIB_STRUCT_H_
+#define _FDT_LIB_STRUCT_H_
 
 /**
  * @brief Get the string at the given offset in the strings block.
@@ -21,10 +11,6 @@
  * @return The string at the given offset.
 */
 const char *fdt_get_string(const void *fdt_blob, int offset);
-
-/**
- * Interacting with the struct block
-*/
 
 /**
  * @brief Get the property at the current offset (iter).
@@ -93,6 +79,9 @@ const char *fdt_get_node_name(const void *fdt_blob, int offset, int *err);
 */
 int fdt_find_root(const void *fdt_blob);
 
+/**
+ * @brief The type of object being iterated over
+*/
 typedef enum {
     CHILD_NODES = 0,
     PROPERTIES
@@ -115,6 +104,7 @@ struct fdt_iter {
  * @param iter pointer to the fdt_iter object to initialize
  * @param type the type of devicetree object we're iterating over (child node, property)
  * @param offset offset in the device tree binary that the pointer will start at
+ * @param fdt_blob pointer to the beginning of the device tree in memory
 */
 void fdt_iter_init(struct fdt_iter *iter, uint32_t offset, fdt_iter_type_t type, const void *fdt_blob);
 
@@ -122,11 +112,10 @@ void fdt_iter_init(struct fdt_iter *iter, uint32_t offset, fdt_iter_type_t type,
  * @brief Given an iterator object pointing to the beginning of a node,
  * get the next object of the specified type (child node or property) 
  * 
- * @param iter FDT iterator object, holds the offset of the current device node in the device tree.
- * @param type The type of object the user wants to iterate over.
+ * @param iter FDT iterator object
  * 
  * @return The offset within the devicetree of the next object in the iteration, or < 0 if error.
 */
 int fdt_iter_get_next(struct fdt_iter *iter);
 
-#endif /* _FDT_LIB_TOOLS_H_ */
+#endif /* _FDT_LIB_STRUCT_H_ */

@@ -1,5 +1,5 @@
-#ifndef _FDT_LIB_MEM_REV_BLOCK_H_
-#define _FDT_LIB_MEM_REV_BLOCK_H_
+#ifndef _FDT_LIB_MEM_REV_H_
+#define _FDT_LIB_MEM_REV_H_
 
 /**
  * @brief Get the next reserve entry at the given offset.
@@ -27,4 +27,4 @@ uint64_t fdt_get_resv_entry_addr(const struct fdt_reserve_entry *entry);
 */
 uint64_t fdt_get_resv_entry_size(const struct fdt_reserve_entry *entry);
 
-#endif /* _FDT_LIB_MEM_REV_BLOCK_H_ */
+#endif /* _FDT_LIB_MEM_REV_H_ */

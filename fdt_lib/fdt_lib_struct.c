@@ -1,5 +1,5 @@
 #include "fdt_lib.h"
-#include "fdt_lib_tools.h"
+#include "fdt_lib_struct.h"
 #include "fdt_lib_header.h"
 
 
@@ -18,13 +18,17 @@ const char *fdt_get_string(const void *fdt_blob, int offset)
 /**
  * @brief Checks if the data at the given offset is a token.
  * 
- * @param iter FDT iterator object; holds the offset of the token.
+ * @param fdt_blob Pointer to the beginning of the device tree in memory
+ * @param offset A given offset in the device tree
  * 
- * @return 1 if there is a valid token at the offset; -FDT_ERR_UNKNOWN_TOKEN otherwise.
+ * @return 1 if there is a valid token at the offset; < 0 if there was an error
 */
 static int is_offset_a_token_(const void *fdt_blob, int offset)
 {
     uint32_t token;
+
+    if (offset > fdt_get_totalsize(fdt_blob))
+        return -FDT_ERR_BAD_ARG;
 
     token = convert_32_to_big_endian(fdt_get_offset_in_blob(fdt_blob, offset));
     switch (token) {
@@ -48,7 +52,8 @@ static int is_offset_a_token_(const void *fdt_blob, int offset)
 /**
  * @brief Get the token at the given offset.
  * 
- * @param iter FDT iterator object; holds the offset of the token.
+ * @param fdt_blob Pointer to the beginning of the device tree in memory
+ * @param offset The offset of the token in the device tree
  * 
  * @return token at given offset OR < 0 if there is no known token at that offset.
 */
@@ -63,8 +68,8 @@ static int fdt_get_token_(const void *fdt_blob, int offset)
 /**
  * @brief Skip to the next token.
  * 
- * @param fdt_blob pointer to the devicetree in memory 
- * @param offset offset of the current token
+ * @param fdt_blob Pointer to the beginning of the device tree in memory
+ * @param offset The offset of the token in the device tree
  * 
  * @return Offset of the next token, or < 0 if there was an error.
 */
@@ -247,13 +252,7 @@ int fdt_next_property_(struct fdt_iter *iter)
 
     offset = iter->offset;
 
-    // skip over the contents of the current property
-    offset += FDT_TOKEN_SIZE;
-    uint32_t prop_value_len = fdt_get_prop_len_by_offset(iter->fdt_blob, offset);
-    offset += (sizeof(uint32_t) * 2) + prop_value_len; 
-    offset = FDT_ALIGN_ON(offset, FDT_TOKEN_SIZE);
-
-    for (; 
+    for (offset = fdt_skip_to_next_token_(iter->fdt_blob, offset); 
         offset < iter->end_struct_block; 
         offset = fdt_skip_to_next_token_(iter->fdt_blob, offset)) {
 

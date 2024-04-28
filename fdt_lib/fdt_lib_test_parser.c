@@ -4,8 +4,8 @@
 
 #include "fdt_lib.h"
 #include "fdt_lib_header.h"
-#include "fdt_lib_mem_rev_block.h"
-#include "fdt_lib_tools.h"
+#include "fdt_lib_mem_rev.h"
+#include "fdt_lib_struct.h"
 
 #define DEBUG_FLAG 0
 

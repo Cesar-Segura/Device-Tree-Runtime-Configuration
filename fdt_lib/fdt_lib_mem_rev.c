@@ -1,5 +1,5 @@
 #include "fdt_lib.h" 
-#include "fdt_lib_mem_rev_block.h"
+#include "fdt_lib_mem_rev.h"
 
 const struct fdt_reserve_entry *fdt_next_reserve_entry(const void *fdt_blob, int *offset)
 {
