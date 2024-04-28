@@ -10,7 +10,7 @@
 /** @brief Get the "magic" field of the fdt_header struct. */
 uint32_t fdt_get_magic(const void *fdt);
 /** @brief Get the "totalsize" field of the fdt_header struct. */
-uint32_t fdt_get_totalsize(const void *fdt) ;
+uint32_t fdt_get_totalsize(const void *fdt);
 /** @brief Get the "off_dt_struct" field of the fdt_header struct. */
 uint32_t fdt_get_off_dt_struct(const void *fdt);
 /** @brief Get the "off_dt_strings" field of the fdt_header struct. */

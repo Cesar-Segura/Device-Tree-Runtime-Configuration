@@ -4,8 +4,8 @@
 
 #include "fdt_lib.h"
 #include "fdt_lib_header.h"
-#include "fdt_lib_mem_rev_block.h"
-#include "fdt_lib_tools.h"
+#include "fdt_lib_mem_rev.h"
+#include "fdt_lib_struct.h"
 
 #define DEBUG_FLAG 0
 
@@ -40,17 +40,15 @@ static void print_header_contents(const void *fdt_blob)
 */
 static void print_mem_resv_block(const void *fdt_blob)
 {
-    struct fdt_iter iter;
+    int offset;
 	const struct fdt_reserve_entry *entry;
 
-    fdt_iter_init(&iter, 0, fdt_blob);
-
-	iter.offset = fdt_get_off_mem_rsvmap(fdt_blob);
+    offset = fdt_get_off_mem_rsvmap(fdt_blob);
 
 	printf("Printing Memory Reservation Block Contents:\n");
 
 	do {
-        entry = fdt_next_reserve_entry(&iter);
+        entry = fdt_next_reserve_entry(fdt_blob, &offset);
         printf("Address: 0x%llx\n", fdt_get_resv_entry_addr(entry));
         printf("Size: %llu\n", fdt_get_resv_entry_size(entry)); 
 	} while (entry->address != 0 || entry->size != 0);
@@ -97,43 +95,18 @@ static void fdt_print_property(const void *fdt_blob, const struct fdt_property *
 }
 
 
-/**
- * @brief Iterate over a set of properties.
-*/
-static void sample_print_properties(struct fdt_iter *iter)
+static void sample_print_node(const void *fdt_blob, int offset)
 {
-    int err;
+    struct fdt_iter prop_iter, node_iter;
     const struct fdt_property *prop;
-    struct fdt_iter curr_iter;
-
-    fdt_iter_dup(&curr_iter, iter);
+    int err;
 
     err = 0;
-    for (err = fdt_first_property(&curr_iter);
-        err > 0;
-        err = fdt_next_property(&curr_iter))
-    {
-        prop = fdt_get_property(&curr_iter, &err);
-        if (err == 0) {
-           fdt_print_property(curr_iter.fdt_blob, prop); 
-        } else {
-            printf("ERROR: error code %d\n", -err);
-            return;
-        }
-    }
-}
-
-static void sample_print_node(struct fdt_iter *curr_iter)
-{
-    int err;
-    struct fdt_iter iter;
-    
-    fdt_iter_dup(&iter, curr_iter);
+    fdt_iter_init(&prop_iter, offset, PROPERTIES, fdt_blob);
+    fdt_iter_init(&node_iter, offset, CHILD_NODES, fdt_blob);
 
     /* Print name */
-    DEBUG("Printing node name");
-    err = 0;
-    const char *node_name = fdt_get_node_name(&iter, &err);
+    const char *node_name = fdt_get_node_name(fdt_blob, offset, &err);
     if (err == 0) {
         printf("%s\n", node_name);
     } else {
@@ -142,19 +115,27 @@ static void sample_print_node(struct fdt_iter *curr_iter)
     }
 
     /* Print properties */
-    DEBUG("Printing node properties");
-    sample_print_properties(&iter); 
-    printf("\n"); 
+    for (err = fdt_iter_get_next(&prop_iter);
+        err > 0;
+        err = fdt_iter_get_next(&prop_iter)) {
+        
+        prop = fdt_get_property(fdt_blob, prop_iter.offset, &err);
+        if (err == 0) {
+           fdt_print_property(fdt_blob, prop); 
+        } else {
+            printf("ERROR: error code %d\n", -err);
+            return;
+        }
+    }
+
+    printf("\n");  // spacer 
 
 
     /* Print child nodes */
-    DEBUG("Printing subnodes");
-    err = 0;
-    for (err = fdt_first_child_node(&iter);
+    for (err = fdt_iter_get_next(&node_iter);
         err > 0;
-        err = fdt_next_child_node(&iter))
-    {
-        sample_print_node(&iter);
+        err = fdt_iter_get_next(&node_iter)) {
+        sample_print_node(fdt_blob, node_iter.offset);
     }
 }
 
@@ -164,14 +145,11 @@ static void sample_print_node(struct fdt_iter *curr_iter)
 */
 static void print_struct_block(const void *fdt_blob)
 {
+    int offset;
     // get the root node of the fdt
-    int err;
-    struct fdt_iter iter;    
-
-    err = 0;
-    if ((err = fdt_find_root(&iter, fdt_blob)) > 0) {
+    if ((offset = fdt_find_root(fdt_blob)) > 0) {
         // print the entire fdt recursively, starting with the root node
-        sample_print_node(&iter);
+        sample_print_node(fdt_blob, offset);
     } else {
         printf("Error: no root node found in fdt\n");
     }
