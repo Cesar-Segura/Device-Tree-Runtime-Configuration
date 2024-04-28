@@ -27,7 +27,7 @@ static int is_offset_a_token_(const void *fdt_blob, int offset)
 {
     uint32_t token;
 
-    if (offset > fdt_get_totalsize(fdt_blob))
+    if (offset < 0 || (uint32_t) offset > fdt_get_totalsize(fdt_blob))
         return -FDT_ERR_BAD_ARG;
 
     token = convert_32_to_big_endian(fdt_get_offset_in_blob(fdt_blob, offset));
@@ -309,7 +309,8 @@ const char *fdt_get_node_name(const void *fdt_blob, int offset, int *err)
 int fdt_find_root(const void *fdt_blob)
 {
     struct fdt_header header;
-    int token, offset;
+    int token;
+    uint32_t offset;
 
     header.totalsize = fdt_get_totalsize(fdt_blob);
     header.off_dt_struct = fdt_get_off_dt_struct(fdt_blob);

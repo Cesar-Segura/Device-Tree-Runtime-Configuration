@@ -1,7 +1,7 @@
-#include <stddef.h>
-
 #include "fdt_lib.h"
 #include "fdt_lib_header.h"
+
+#define attr_size(header, attr) (sizeof( ((header *)0)->attr ))
 
 /**
  * @brief Get a fdt_header attribute.
@@ -16,52 +16,52 @@ static uint32_t fdt_get_header(const void *fdt, uint32_t field_offset)
 
 uint32_t fdt_get_magic(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, magic)); 
+    return fdt_get_header(fdt, attr_size(struct fdt_header, magic) * 0); 
 }
 
 uint32_t fdt_get_totalsize(const void *fdt) 
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, totalsize)); 
+    return fdt_get_header(fdt, attr_size(struct fdt_header, totalsize) * 1); 
 }
 
 uint32_t fdt_get_off_dt_struct(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, off_dt_struct)); 
+    return fdt_get_header(fdt, attr_size(struct fdt_header, off_dt_struct) * 2); 
 }
 
 uint32_t fdt_get_off_dt_strings(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, off_dt_strings));
+    return fdt_get_header(fdt, attr_size(struct fdt_header, off_dt_strings) * 3);
 }
 
 uint32_t fdt_get_off_mem_rsvmap(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, off_mem_rsvmap));
+    return fdt_get_header(fdt, attr_size(struct fdt_header, off_mem_rsvmap) * 4);
 }
 
 uint32_t fdt_get_version(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, version));
+    return fdt_get_header(fdt, attr_size(struct fdt_header, version) * 5);
 }
 
 uint32_t fdt_get_last_comp_version(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, last_comp_version));
+    return fdt_get_header(fdt, attr_size(struct fdt_header, last_comp_version) * 6);
 }
 
 uint32_t fdt_get_boot_cpuid_phys(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, boot_cpuid_phys));
+    return fdt_get_header(fdt, attr_size(struct fdt_header, boot_cpuid_phys) * 7);
 }
 
 uint32_t fdt_get_size_dt_strings(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, size_dt_strings)); 
+    return fdt_get_header(fdt, attr_size(struct fdt_header, size_dt_strings) * 8); 
 }
 
 uint32_t fdt_get_size_dt_struct(const void *fdt)
 {
-    return fdt_get_header(fdt, offsetof(struct fdt_header, size_dt_struct)); 
+    return fdt_get_header(fdt, attr_size(struct fdt_header, size_dt_struct) * 9); 
 }
 
 void fdt_get_header_contents(const void *fdt, struct fdt_header *header)

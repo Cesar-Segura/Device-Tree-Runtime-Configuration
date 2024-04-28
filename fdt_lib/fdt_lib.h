@@ -1,7 +1,9 @@
 #ifndef _FDT_LIB_H_
 #define _FDT_LIB_H_
 
-#include <stdint.h>
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
+typedef unsigned char uint8_t;
 
 #define FDT_MAGIC 0xd00dfeed
 
