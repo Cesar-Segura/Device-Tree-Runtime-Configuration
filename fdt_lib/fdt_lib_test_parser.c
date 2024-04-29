@@ -86,7 +86,7 @@ static void fdt_print_property(const void *fdt_blob, const struct fdt_property *
         // print bytes
         prop_len = fdt_get_property_len(prop);
         uint8_t *value = (uint8_t *) prop->value; 
-        for (int i = 0; i < prop_len; i++) {
+        for (uint32_t i = 0; i < prop_len; i++) {
             printf("%02x", value[i]); 
         }
     }
